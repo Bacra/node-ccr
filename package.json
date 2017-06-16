@@ -1,0 +1,30 @@
+{
+  "name": "ccr",
+  "version": "1.0.0",
+  "description": "File Cache Mgr.",
+  "main": "index.js",
+  "scripts": {
+    "test": "node test/test-index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Bacra/node-ccr.git"
+  },
+  "keywords": [
+    "safe",
+    "cache",
+    "file",
+    "writer"
+  ],
+  "author": "Bacra Woo <bacra.woo@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Bacra/node-ccr/issues"
+  },
+  "homepage": "https://github.com/Bacra/node-ccr",
+  "dependencies": {
+    "bluebird": "^3.5.0",
+    "debug": "^2.6.8",
+    "mkdirp": "^0.5.1"
+  }
+}
