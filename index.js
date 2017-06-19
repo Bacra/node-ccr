@@ -62,7 +62,7 @@ Cacher.prototype =
 		return self.file(userid)
 			.then(function(file)
 			{
-				var tmpfile = file+'~';
+				var tmpfile = file+'.ccr~';
 
 				return fs.writeFileAsync(tmpfile, content)
 					.then(function()
