@@ -67,7 +67,7 @@ Cacher.prototype =
 				return fs.writeFileAsync(tmpfile, content)
 					.then(function()
 					{
-						return fs.rename(tmpfile, file);
+						return fs.renameAsync(tmpfile, file);
 					});
 			});
 	},
