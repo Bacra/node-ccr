@@ -64,7 +64,7 @@ Cacher.prototype =
 	{
 		if (!file) return;
 
-		var aes_key = this.options.aes_key || 'do&j3m()==3{]ddd';
+		var aes_key = this.options.aes_key || this.name+'/do&j3m()==3{]ddd/'+this.root;
 
 		// root+file的时候，必定有"/" 字符
 		if (file.indexOf('/') != -1)
