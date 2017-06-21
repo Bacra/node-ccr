@@ -65,18 +65,14 @@ Cacher.prototype =
 		if (!file) return;
 
 		var aes_key = this.options.aes_key || this.name+'/do&j3m()==3{]ddd/'+this.root;
+		var dir = this._root();
 
 		// root+file的时候，必定有"/" 字符
 		if (file.indexOf('/') != -1)
 		{
-			if (file.substr(0, this.root.length) == this.root)
+			if (file.substr(0, dir.length) == dir)
 			{
-				var info = file.substr(this.root.length);
-				if (info[0] != '/')
-				{
-					throw new Error('FILE_NOT_IN_ROOT_PATH');
-				}
-
+				var info = file.substr(dir.length);
 				info += ','+Date.now();
 
 				var cipher = crypto.createCipher('aes-256-cbc', aes_key);
@@ -107,7 +103,7 @@ Cacher.prototype =
 			if (ttl)
 			{
 				return {
-					file: this.root +'/'+ arr.join(','),
+					file: dir + arr.join(','),
 					ttl: +ttl
 				};
 			}
@@ -172,14 +168,18 @@ Cacher.prototype =
 				return dir;
 			});
 	},
+	_root: function()
+	{
+		return this.root+'/'+this.name+'/';
+	},
 
 	pathstr: function(userid)
 	{
-		var dir = this.root +'/'+ this.name;
+		var dir = this._root();
 		var datepath = this.options.datepath;
 		if (datepath !== false)
 		{
-			dir += '/'+(datepath || getToday());
+			dir += datepath || getToday();
 		}
 
 		var subdir = this.options.subdir !== false && (this.options.subdir || 'md5');

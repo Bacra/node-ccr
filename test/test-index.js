@@ -14,7 +14,9 @@ Promise.all(
 			{
 				var sid = cache.downloadkey(file);
 				var info = cache.downloadkey(sid);
-				console.log(sid, info);
+
+				if (file != info.file) throw new Error('file not match');
+				console.log(file, sid, info);
 			})
 	])
 	.catch(function(err)
