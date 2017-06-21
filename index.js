@@ -83,7 +83,7 @@ Cacher.prototype =
 				var sid = cipher.update(info, 'utf8', 'base64');
 				sid += cipher.final('base64');
 
-				return 'EA_'+sid.replace(safeBase64Reg3, '')
+				return sid.replace(safeBase64Reg3, '')
 					.replace(safeBase64Reg11, '-')
 					.replace(safeBase64Reg21, '_');
 			}
@@ -92,9 +92,9 @@ Cacher.prototype =
 				throw new Error('FILE_NOT_IN_ROOT_PATH');
 			}
 		}
-		else if (file.substr(0, 3) == 'EA_')
+		else
 		{
-			file = file.substr(3).replace(safeBase64Reg1, '+')
+			file = file.replace(safeBase64Reg1, '+')
 				.replace(safeBase64Reg2, '\/');
 
 			var decipher = crypto.createDecipher('aes-256-cbc', aes_key);
@@ -115,10 +115,6 @@ Cacher.prototype =
 			{
 				throw new Error('INVALID_FILE_SID');
 			}
-		}
-		else
-		{
-			throw new Error('INVALID_FILE_SID');
 		}
 	},
 
