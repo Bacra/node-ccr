@@ -66,16 +66,24 @@ Cacher.prototype =
 
 		var aes_key = this.options.aes_key || 'do&j3m()==3{]ddd';
 
-		if (file.indexOf('/') != -1 || file.indexOf('\\') != -1)
+		// root+file的时候，必定有"/" 字符
+		if (file.indexOf('/') != -1)
 		{
 			if (file.substr(0, this.root.length) == this.root)
 			{
+				var info = file.substr(this.root.length);
+				if (info[0] != '/')
+				{
+					throw new Error('FILE_NOT_IN_ROOT_PATH');
+				}
+
+				info += ','+Date.now();
+
 				var cipher = crypto.createCipher('aes-256-cbc', aes_key);
-				var info = file.substr(this.root.length)+','+Date.now();
 				var sid = cipher.update(info, 'utf8', 'base64');
 				sid += cipher.final('base64');
 
-				return sid.replace(safeBase64Reg3, '')
+				return 'EA_'+sid.replace(safeBase64Reg3, '')
 					.replace(safeBase64Reg11, '-')
 					.replace(safeBase64Reg21, '_');
 			}
@@ -84,9 +92,9 @@ Cacher.prototype =
 				throw new Error('FILE_NOT_IN_ROOT_PATH');
 			}
 		}
-		else
+		else if (file.substr(0, 3) == 'EA_')
 		{
-			file = file.replace(safeBase64Reg1, '+')
+			file = file.substr(3).replace(safeBase64Reg1, '+')
 				.replace(safeBase64Reg2, '\/');
 
 			var decipher = crypto.createDecipher('aes-256-cbc', aes_key);
@@ -107,6 +115,10 @@ Cacher.prototype =
 			{
 				throw new Error('INVALID_FILE_SID');
 			}
+		}
+		else
+		{
+			throw new Error('INVALID_FILE_SID');
 		}
 	},
 
@@ -167,7 +179,7 @@ Cacher.prototype =
 
 	pathstr: function(userid)
 	{
-		var dir = this.root+'/'+this.name;
+		var dir = this.root +'/'+ this.name;
 		var datepath = this.options.datepath;
 		if (datepath !== false)
 		{
