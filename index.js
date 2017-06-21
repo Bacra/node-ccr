@@ -9,6 +9,11 @@ exports = module.exports = Cacher;
 exports.root = '/tmp/node-ccr';
 
 var pathClearReg = /[\/\\]?\.\.[\/\\]/g;
+var safeBase64Reg1 = /\-/g;
+var safeBase64Reg11 = /\+/g;
+var safeBase64Reg2 = /_/g;
+var safeBase64Reg21 = /\//g;
+var safeBase64Reg3 = /=+$/g;
 
 
 var today, nextUpdate;
@@ -55,6 +60,58 @@ function Cacher(name, options)
 
 Cacher.prototype =
 {
+	downloadkey: function(file)
+	{
+		if (!file) return;
+
+		var aes_key = this.options.aes_key || 'do&j3m()==3{]ddd';
+
+		if (file.indexOf('/') != -1 || file.indexOf('\\') != -1)
+		{
+			if (file.substr(0, this.root.length) == this.root)
+			{
+				var cipher = crypto.createCipher('aes-256-cbc', aes_key);
+				var info = file.substr(this.root.length)+','+Date.now();
+				var sid = cipher.update(info, 'utf8', 'base64');
+				sid += cipher.final('base64');
+
+				return sid.replace(safeBase64Reg3, '')
+					.replace(safeBase64Reg11, '-')
+					.replace(safeBase64Reg21, '_');
+			}
+			else
+			{
+				throw new Error('FILE_NOT_IN_ROOT_PATH');
+			}
+		}
+		else
+		{
+			file = file.replace(safeBase64Reg1, '+')
+				.replace(safeBase64Reg2, '\/');
+
+			var decipher = crypto.createDecipher('aes-256-cbc', aes_key);
+			var info = decipher.update(file, 'base64', 'utf8');
+			info += decipher.final('utf8');
+
+			var arr = info.split(',');
+			var ttl = +arr.pop();
+
+			if (ttl)
+			{
+				return {
+					file: this.root +'/'+ arr.join(','),
+					ttl: +ttl
+				};
+			}
+			else
+			{
+				throw new Error('INVALID_FILE_SID');
+			}
+		}
+	},
+
+
+
 	write: function(content, userid)
 	{
 		var self = this;
