@@ -52,10 +52,10 @@ function Cacher(name, options)
 		return new Cacher(name, options);
 	}
 
-	this.root = exports.root;
 	this.name = this.clear(name);
 	this.index = 0;
 	this.options = options || {};
+	this.root = this.options.root || exports.root;
 }
 
 Cacher.prototype =
