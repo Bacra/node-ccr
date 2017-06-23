@@ -103,7 +103,7 @@ Cacher.prototype =
 			if (ttl)
 			{
 				return {
-					file: dir + arr.join(','),
+					file: dir + this.clear(arr.join(',')),
 					ttl: +ttl
 				};
 			}
