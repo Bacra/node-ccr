@@ -1,4 +1,4 @@
-c(a)c(he)r  [![Build Status](https://travis-ci.org/Bacra/node-ccr.svg?branch=master)](https://travis-ci.org/Bacra/node-ccr)
+CCR  [![Build Status](https://travis-ci.org/Bacra/node-ccr.svg?branch=master)](https://travis-ci.org/Bacra/node-ccr)
 ==================
 
 File Cache Mgr.
@@ -6,20 +6,17 @@ File Cache Mgr.
 ## Usage
 
 ```javascript
-var cache = require('ccr')('user_cache');
+var cache = require('ccr')('test_cache');
 
-// write file content, return promise
-cache.write('file content', 'userid');
+cache.file('userid').then(function(file)
+{
+    // mkdirp paths auto
+    console.log(file);
+    // print /tmp/node-ccr/test_cache/2018/0523/15929_0148/1
 
-var dir = cache.pathstr('userid');
-console.log(dir);
-// print "/tmp/node-ccr/user_cache/20170616/md5_ea/8f538c94b6e352418254ed6474a81f"
-
-var filename = cache.filename();
-console.log(filename);
-// print "13800_1497619564546_1.tmp"
-
-cache.file('userid').then(function(file){console.log(file)})
-// return promise
-// print "/tmp/node-ccr/user_cache/20170616/md5_ea/8f538c94b6e352418254ed6474a81f/13800_1497619564552_3.tmp"
+    var sid = cache.downloadkey(file, 'userid');
+    // print S1Agc3os25Nynh4uI2tl5ZNOlBN7yUU1PvF1RTUJ5WsGHzDoPE9RdgAZbKvvr7EP
+    console.log(cache.downloadkey(sid, 'userid'));
+    // print { file: '/tmp/node-ccr/test_cache/2018/0523/15929_0148/1', ttl: 1527075918176 }
+});
 ```

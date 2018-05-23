@@ -2,13 +2,11 @@ var Promise	= require('bluebird');
 var crypto	= require('crypto');
 var fs		= Promise.promisifyAll(require('fs'));
 var mkdirp	= Promise.promisify(require('mkdirp'));
-var path	= Promise.promisifyAll(require('path'));
 var debug	= require('debug')('ccr');
 
 exports = module.exports = Cacher;
 exports.root = '/tmp/node-ccr';
 
-var pathClearReg = /[\/\\]?\.\.[\/\\]/g;
 var safeBase64Reg1 = /\-/g;
 var safeBase64Reg11 = /\+/g;
 var safeBase64Reg2 = /_/g;
@@ -16,25 +14,23 @@ var safeBase64Reg21 = /\//g;
 var safeBase64Reg3 = /=+$/g;
 
 
-var today, nextUpdate;
-function getToday()
+var todayPath, nextUpdate;
+function getTodayPath()
 {
-	var now = new Date;
-	if (!today || nextUpdate < now)
+	var now = new Date();
+	if (!todayPath || nextUpdate < now)
 	{
-		var arr =
-			[
-				now.getFullYear(),
-				zero(now.getMonth()+1),
-				zero(now.getDate())
-			];
-		today = arr.join('');
-		nextUpdate = new Date(arr.join('/')+' 0:0:0');
-		nextUpdate.setDate(nextUpdate.getDate()+1);
-		nextUpdate = +nextUpdate;
+		todayPath = now.getFullYear()+'/'+zero(now.getMonth()+1)+zero(now.getDate());
+
+		now.setDate(now.getDate()+1);
+		now.setHours(0);
+		now.setMinutes(0);
+		now.setSeconds(0);
+		now.setMilliseconds(0);
+		nextUpdate = +now;
 	}
 
-	return today;
+	return todayPath;
 }
 
 function zero(num)
@@ -52,19 +48,21 @@ function Cacher(name, options)
 		return new Cacher(name, options);
 	}
 
-	this.name = this.clear(name);
-	this.index = 0;
+	this.name = name;
 	this.options = options || {};
+	this._index = 0;
+	this._dir = null;
 	this.root = this.options.root || exports.root;
 }
 
 Cacher.prototype =
 {
-	downloadkey: function(file)
+	downloadkey: function(file, userid)
 	{
 		if (!file) return;
 
 		var aes_key = this.options.aes_key || this.name+'/do&j3m()==3{]ddd';
+		if (userid) aes_key += ','+userid;
 		var dir = this._root();
 
 		// root+file的时候，必定有"/" 字符
@@ -99,12 +97,19 @@ Cacher.prototype =
 
 			var arr = info.split(',');
 			var ttl = +arr.pop();
+			var file = arr.join(',').trim();
+			// 如果是这个框架生成的文件，不可能有..的字符
+			if (file.indexOf('..') != -1)
+			{
+				debug('file path has "..": %s', file);
+				throw new Error('INVALID_FILE_SID');
+			}
 
 			if (ttl)
 			{
 				return {
-					file: dir + this.clear(arr.join(',')),
-					ttl: +ttl
+					file: dir + file,
+					ttl: ttl
 				};
 			}
 			else
@@ -114,111 +119,80 @@ Cacher.prototype =
 		}
 	},
 
+	file: function()
+	{
+		var index = ++this._index;
+		// linux math files is 32000
+		if (index > 20000)
+		{
+			this._dir = null;
+			this._index = index = 0;
+		}
 
+		return this.path()
+			.then(function(dir)
+			{
+				return dir+'/'+index;
+			});
+	},
 
-	write: function(content, userid)
+	path: function()
 	{
 		var self = this;
+		var daypath = getTodayPath();
 
-		return self.file(userid)
-			.then(function(file)
+		if (self._dir)
+		{
+			return self._dir.then(function(oldInfo)
 			{
-				var tmpfile = file+'.ccr~';
+				if (oldInfo && oldInfo.daypath == daypath) return oldInfo.static;
 
-				return fs.writeFileAsync(tmpfile, content)
+				debug('new path, name:%s oldInfo:%o new daypath:%s', self.name, oldInfo, daypath);
+				return self._setSelfDir(daypath);
+			});
+		}
+		else
+		{
+			return self._setSelfDir(daypath);
+		}
+	},
+	_setSelfDir: function(daypath)
+	{
+		var promise = this._newPath(daypath);
+		this._dir = promise.then(function(newpath)
+		{
+			return {daypath: daypath, static: newpath};
+		});
+
+		return promise;
+	},
+	_newPath: function(daypath)
+	{
+		var self = this;
+		var random = ''+(Math.random() *1000|0);
+		// 补齐一下位数，目录创建出来整齐一些
+		random = '0000'.substr(random.length)+random;
+
+		var subpath = process.pid+'_'+random;
+		var newpath = this._root()+daypath+'/'+subpath;
+
+		return fs.statAsync(newpath)
+			.then(function()
+			{
+				return self._newPath(daypath);
+			},
+			function(err)
+			{
+				return mkdirp(newpath)
 					.then(function()
 					{
-						return fs.renameAsync(tmpfile, file);
+						return newpath;
 					});
 			});
 	},
 
-	file: function(userid)
-	{
-		var self = this;
-
-		return this.path(userid)
-			.then(function(dir)
-			{
-				return dir+'/'+self.filename();
-			});
-	},
-
-	filename: function()
-	{
-		if (++this.index > 999) this.index = 0;
-		return [process.pid, Date.now(), this.index].join('_')+'.tmp';
-	},
-
-	path: function(userid)
-	{
-		var dir = this.pathstr(userid);
-
-		return fs.statAsync(dir)
-			.catch(function(err)
-			{
-				if (err)
-				{
-					debug('path maybe not exists: %s err:%o', dir, err);
-					return mkdirp(dir);
-				}
-			})
-			.then(function()
-			{
-				return dir;
-			});
-	},
 	_root: function()
 	{
 		return this.root+'/'+this.name+'/';
 	},
-
-	pathstr: function(userid)
-	{
-		var dir = this._root();
-		var datepath = this.options.datepath;
-		if (datepath !== false)
-		{
-			dir += datepath || getToday();
-		}
-
-		var subdir = this.options.subdir !== false && (this.options.subdir || 'md5');
-
-		// 增加一个二级目录
-		if (userid && (subdir == 'md5' || subdir == 'userid'))
-		{
-			if (subdir == 'userid')
-			{
-				userid = this.clear(userid);
-				dir += '/id_'+(''+userid).slice(-3);
-				var dir2 = (''+userid).slice(-6, -3);
-				if (dir2) dir += '/b'+dir2;
-				dir += '/'+userid;
-			}
-			else
-			{
-				var md5 = crypto.createHash('md5')
-					.update(''+userid, 'binary')
-					.digest('hex');
-
-				dir += '/md5_'+md5.slice(0, 2)+'/'+md5.slice(2);
-			}
-		}
-		else if (this.options.subdir !== false)
-		{
-			// random 类似于
-			if (++this.index > 999) this.index = 0;
-			dir += '/rd_'+this.index;
-		}
-
-		debug('path string: %s', dir);
-
-		return dir;
-	},
-
-	clear: function(dir)
-	{
-		return (''+dir).replace(pathClearReg, './');
-	}
 };
-

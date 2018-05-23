@@ -8,12 +8,11 @@ var Promise	= require('bluebird');
 
 Promise.all(
 	[
-		cache.write('xxxxxxx', 111),
-		cache.file(222)
+		cache.file()
 			.then(function(file)
 			{
-				var sid = cache.downloadkey(file);
-				var info = cache.downloadkey(sid);
+				var sid = cache.downloadkey(file, 'userid');
+				var info = cache.downloadkey(sid, 'userid');
 
 				if (file != info.file) throw new Error('file not match');
 				console.log(file, sid, info);
@@ -24,5 +23,3 @@ Promise.all(
 		console.error(err.stack);
 		process.exit(1);
 	});
-
-
