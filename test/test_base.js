@@ -1,25 +1,17 @@
-var debug = require('debug');
-debug.enable('ccr*');
+var expect = require('expect.js');
+var cache = require('..')('test_cache');
+cache.root = __dirname+'/tmp';
 
-var cache	= require('../')('test_cache');
-cache.root	= __dirname+'/tmp';
-var Promise	= require('bluebird');
-
-
-Promise.all(
-	[
-		cache.file()
+describe('#base', () => {
+	it('#base', () => {
+		return cache.file()
 			.then(function(file)
 			{
 				var sid = cache.downloadkey(file, 'userid');
 				var info = cache.downloadkey(sid, 'userid');
 
-				if (file != info.file) throw new Error('file not match');
+				expect(file).to.be(info.file);
 				console.log(file, sid, info);
-			})
-	])
-	.catch(function(err)
-	{
-		console.error(err.stack);
-		process.exit(1);
+			});
 	});
+});

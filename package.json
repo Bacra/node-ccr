@@ -4,7 +4,10 @@
   "description": "File Cache Mgr.",
   "main": "index.js",
   "scripts": {
-    "test": "node test/test-index.js"
+    "lint": "eslint .",
+    "test": "cross-env DEBUG=ccr* mocha test/test_*.js",
+    "test-cov": "istanbul cover _mocha -- test/test_* --reporter dot",
+    "test-travis": "istanbul cover _mocha --report lcovonly -- test/test_* --reporter dot"
   },
   "repository": {
     "type": "git",
@@ -23,8 +26,18 @@
   },
   "homepage": "https://github.com/Bacra/node-ccr",
   "dependencies": {
-    "bluebird": "^3.5.0",
-    "debug": "^2.6.8",
-    "mkdirp": "^0.5.1"
+    "bluebird": "^3.7.0",
+    "debug": "^4.1.1",
+    "mkdirp": "^0.5.1",
+    "time-key": "^0.3.0"
+  },
+  "devDependencies": {
+    "babel-eslint": "^10.0.3",
+    "cross-env": "^2.0.0",
+    "eslint": "^6.5.1",
+    "eslint-config-brcjs": "^1.1.1",
+    "expect.js": "^0.3.1",
+    "istanbul": "^0.4.5",
+    "mocha": "^3.5.3"
   }
 }
