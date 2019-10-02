@@ -9,7 +9,7 @@ describe('#base', () => {
 		var cache = ccr('test_cache');
 
 		return cache.file()
-			.then(function(file) {
+			.then(file => {
 				var sid = cache.downloadkey(file, 'userid');
 				var sidfile = cache.downloadkey(sid, 'userid');
 
@@ -34,13 +34,24 @@ describe('#base', () => {
 		});
 
 		return cache.file()
-			.then(function(file)
-			{
+			.then(file => {
 				var sid = cache.downloadkey(file, 'userid');
 				var sidfile = cache.downloadkey(sid, 'userid');
 
 				console.log('file: %s sid: %s sidfile: %s', file, sid, sidfile);
 				expect(file).to.be(sidfile);
+			});
+	});
+
+	it('#depd crypto', () => {
+		var cache = ccr('depd_crypto');
+
+		return cache.file()
+			.then(file => {
+				// var sid = cache.downloadkey(file, 'userid');
+				var sid = '7CsaxozvZnlMt2tUzY51JjaJxQl7pnlb7TJVszg8rTKnOTpMZ8VEyxWmzmZgdnsy';
+				var sidfile = cache.downloadkey(sid, 'userid');
+				console.log('sid: %s sidfile: %s', sid, sidfile);
 			});
 	});
 });
