@@ -27,7 +27,7 @@ function Cacher(name, options) {
 }
 
 Cacher.prototype = {
-	downloadkey: function (file, userid) {
+	downloadkey: function(file, userid) {
 		if (!file) return;
 
 		var dir = this._root();
@@ -72,7 +72,7 @@ Cacher.prototype = {
 		}
 	},
 
-	file: function () {
+	file: function() {
 		var index = ++this._index;
 		// linux math files is 32000
 		if (index > 20000) {
@@ -81,17 +81,17 @@ Cacher.prototype = {
 		}
 
 		return this.path()
-			.then(function (dir) {
+			.then(function(dir) {
 				return dir + '/' + index;
 			});
 	},
 
-	path: function () {
+	path: function() {
 		var self = this;
 		var daypath = this.timekey.key();
 
 		if (self._dir) {
-			return self._dir.then(function (oldInfo) {
+			return self._dir.then(function(oldInfo) {
 				if (oldInfo && oldInfo.daypath == daypath) return oldInfo.static;
 
 				debug('new path, name:%s oldInfo:%o new daypath:%s', self.name, oldInfo, daypath);
@@ -101,9 +101,9 @@ Cacher.prototype = {
 			return self._setSelfDir(daypath);
 		}
 	},
-	_setSelfDir: function (daypath) {
+	_setSelfDir: function(daypath) {
 		var promise = this._newPath(daypath);
-		this._dir = promise.then(function (newpath) {
+		this._dir = promise.then(function(newpath) {
 			return {
 				daypath: daypath,
 				static: newpath
@@ -112,7 +112,7 @@ Cacher.prototype = {
 
 		return promise;
 	},
-	_newPath: function (daypath) {
+	_newPath: function(daypath) {
 		var self = this;
 		var random = '' + (Math.random() * 1000 | 0);
 		// 补齐一下位数，目录创建出来整齐一些
@@ -122,18 +122,18 @@ Cacher.prototype = {
 		var newpath = this._root() + daypath + '/' + subpath;
 
 		return fs.statAsync(newpath)
-			.then(function () {
-					return self._newPath(daypath);
-				},
-				function () {
-					return mkdirp(newpath)
-						.then(function () {
-							return newpath;
-						});
-				});
+			.then(function() {
+				return self._newPath(daypath);
+			},
+			function() {
+				return mkdirp(newpath)
+					.then(function() {
+						return newpath;
+					});
+			});
 	},
 
-	_root: function () {
+	_root: function() {
 		return this.root + '/' + this.name + '/';
 	},
 };
