@@ -32,10 +32,7 @@
     "time-key": "^0.3.0"
   },
   "devDependencies": {
-    "babel-eslint": "^10.0.3",
     "cross-env": "^2.0.0",
-    "eslint": "^6.5.1",
-    "eslint-config-brcjs": "^1.1.1",
     "expect.js": "^0.3.1",
     "istanbul": "^0.4.5",
     "mocha": "^3.5.3"
