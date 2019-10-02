@@ -3,42 +3,16 @@ var crypto	= require('crypto');
 var fs		= Promise.promisifyAll(require('fs'));
 var mkdirp	= Promise.promisify(require('mkdirp'));
 var debug	= require('debug')('ccr');
+var timekey	= require('time-key');
 
 exports = module.exports = Cacher;
 exports.root = '/tmp/node-ccr';
 
-var safeBase64Reg1 = /\-/g;
+var safeBase64Reg1 = /-/g;
 var safeBase64Reg11 = /\+/g;
 var safeBase64Reg2 = /_/g;
 var safeBase64Reg21 = /\//g;
 var safeBase64Reg3 = /=+$/g;
-
-
-var todayPath, nextUpdate;
-function getTodayPath()
-{
-	var now = new Date();
-	if (!todayPath || nextUpdate < now)
-	{
-		todayPath = now.getFullYear()+'/'+zero(now.getMonth()+1)+zero(now.getDate());
-
-		now.setDate(now.getDate()+1);
-		now.setHours(0);
-		now.setMinutes(0);
-		now.setSeconds(0);
-		now.setMilliseconds(0);
-		nextUpdate = +now;
-	}
-
-	return todayPath;
-}
-
-function zero(num)
-{
-	return num > 9 ? num : '0'+num;
-}
-
-
 
 // Main
 function Cacher(name, options)
@@ -50,8 +24,10 @@ function Cacher(name, options)
 
 	this.name = name;
 	this.options = options || {};
+
 	this._index = 0;
 	this._dir = null;
+	this.timekey = timekey(this.options.timeformat || 'YYYY/MMDD');
 	this.root = this.options.root || exports.root;
 }
 
@@ -89,7 +65,7 @@ Cacher.prototype =
 		else
 		{
 			file = file.replace(safeBase64Reg1, '+')
-				.replace(safeBase64Reg2, '\/');
+				.replace(safeBase64Reg2, '/');
 
 			var decipher = crypto.createDecipher('aes-256-cbc', aes_key);
 			var info = decipher.update(file, 'base64', 'utf8');
@@ -139,7 +115,7 @@ Cacher.prototype =
 	path: function()
 	{
 		var self = this;
-		var daypath = getTodayPath();
+		var daypath = this.timekey.key();
 
 		if (self._dir)
 		{
@@ -181,7 +157,7 @@ Cacher.prototype =
 			{
 				return self._newPath(daypath);
 			},
-			function(err)
+			function()
 			{
 				return mkdirp(newpath)
 					.then(function()
