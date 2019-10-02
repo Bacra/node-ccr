@@ -4,15 +4,11 @@ var fs = Promise.promisifyAll(require('fs'));
 var mkdirp = Promise.promisify(require('mkdirp'));
 var debug = require('debug')('ccr');
 var timekey = require('time-key');
+var base64url = require('base64url');
 
 exports = module.exports = Cacher;
 exports.root = '/tmp/node-ccr';
 
-var safeBase64Reg1 = /-/g;
-var safeBase64Reg11 = /\+/g;
-var safeBase64Reg2 = /_/g;
-var safeBase64Reg21 = /\//g;
-var safeBase64Reg3 = /=+$/g;
 
 // Main
 function Cacher(name, options) {
@@ -47,15 +43,12 @@ Cacher.prototype = {
 				var sid = cipher.update(info, 'utf8', 'base64');
 				sid += cipher.final('base64');
 
-				return sid.replace(safeBase64Reg3, '')
-					.replace(safeBase64Reg11, '-')
-					.replace(safeBase64Reg21, '_');
+				return base64url.fromBase64(sid);
 			} else {
 				throw new Error('FILE_NOT_IN_ROOT_PATH');
 			}
 		} else {
-			file = file.replace(safeBase64Reg1, '+')
-				.replace(safeBase64Reg2, '/');
+			file = base64url.toBase64(file);
 
 			var decipher = crypto.createDecipher('aes-256-cbc', aes_key);
 			var info = decipher.update(file, 'base64', 'utf8');
