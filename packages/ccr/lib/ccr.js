@@ -1,10 +1,10 @@
 var Promise = require('bluebird');
-var crypto = require('crypto');
 var fs = Promise.promisifyAll(require('fs'));
 var mkdirp = Promise.promisify(require('mkdirp'));
 var debug = require('debug')('ccr');
 var timekey = require('time-key');
 var base64url = require('base64url');
+var depdCrypto = require('./depd_crypto');
 
 exports = module.exports = Cacher;
 exports.root = '/tmp/node-ccr';
@@ -29,48 +29,24 @@ Cacher.prototype = {
 	downloadkey: function (file, userid) {
 		if (!file) return;
 
-		var aes_key = this.options.aes_key || this.name + '/do&j3m()==3{]ddd';
-		if (userid) aes_key += ',' + userid;
+		var aesObj = this.options.aes || this.name + '/do&j3m()==3{]ddd';
 		var dir = this._root();
+
+		if (typeof aesObj == 'string') aesObj = depdCrypto(aesObj);
 
 		// root+file的时候，必定有"/" 字符
 		if (file.indexOf('/') != -1) {
 			if (file.substr(0, dir.length) == dir) {
-				var info = file.substr(dir.length);
-				info += ',' + Date.now();
-
-				var cipher = crypto.createCipher('aes-256-cbc', aes_key);
-				var sid = cipher.update(info, 'utf8', 'base64');
-				sid += cipher.final('base64');
+				var data = file.substr(dir.length);
+				var sid = aesObj.encrypt(data, userid);
 
 				return base64url.fromBase64(sid);
 			} else {
 				throw new Error('FILE_NOT_IN_ROOT_PATH');
 			}
 		} else {
-			file = base64url.toBase64(file);
-
-			var decipher = crypto.createDecipher('aes-256-cbc', aes_key);
-			var info = decipher.update(file, 'base64', 'utf8');
-			info += decipher.final('utf8');
-
-			var arr = info.split(',');
-			var ttl = +arr.pop();
-			var file = arr.join(',').trim();
-			// 如果是这个框架生成的文件，不可能有..的字符
-			if (file.indexOf('..') != -1) {
-				debug('file path has "..": %s', file);
-				throw new Error('INVALID_FILE_SID');
-			}
-
-			if (ttl) {
-				return {
-					file: dir + file,
-					ttl: ttl
-				};
-			} else {
-				throw new Error('INVALID_FILE_SID');
-			}
+			var sid = base64url.toBase64(file);
+			return dir + aesObj.decrypt(sid, userid);
 		}
 	},
 

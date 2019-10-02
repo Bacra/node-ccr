@@ -1,17 +1,46 @@
 var expect = require('expect.js');
-var cache = require('..')('test_cache');
-cache.root = __dirname+'/tmp';
+var ccr = require('..');
+var aesid = require('aesid');
+
+ccr.root = __dirname + '/tmp';
 
 describe('#base', () => {
 	it('#base', () => {
+		var cache = ccr('test_cache');
+
+		return cache.file()
+			.then(function(file) {
+				var sid = cache.downloadkey(file, 'userid');
+				var sidfile = cache.downloadkey(sid, 'userid');
+
+				console.log('file: %s sid: %s sidfile: %s', file, sid, sidfile);
+				expect(file).to.be(sidfile);
+			});
+	});
+
+	it('#downloadkey', () => {
+		var sidObj = aesid({
+			userid: true,
+			business: {
+				test: {
+					1: 'aes key 123'
+				}
+			}
+		})
+		.business('test');
+
+		var cache = ccr('test_cache', {
+			aes: sidObj
+		});
+
 		return cache.file()
 			.then(function(file)
 			{
 				var sid = cache.downloadkey(file, 'userid');
-				var info = cache.downloadkey(sid, 'userid');
+				var sidfile = cache.downloadkey(sid, 'userid');
 
-				expect(file).to.be(info.file);
-				console.log(file, sid, info);
+				console.log('file: %s sid: %s sidfile: %s', file, sid, sidfile);
+				expect(file).to.be(sidfile);
 			});
 	});
 });
