@@ -72,17 +72,20 @@ Cacher.prototype = {
 		}
 	},
 
-	file: function() {
+	file: function(userid) {
 		var index = ++this._index;
 		// linux math files is 32000
 		if (index > 20000) {
-			this._dir = null;
+			this._dirPromise = null;
 			this._index = index = 0;
 		}
 
+		var filename = index;
+		if (userid) filename = userid + '_' + filename;
+
 		return this.path()
 			.then(function(dir) {
-				return dir + '/' + index;
+				return dir + '/' + filename;
 			});
 	},
 
