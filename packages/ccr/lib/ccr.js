@@ -31,12 +31,9 @@ Cacher.prototype = {
 
 		var dir = this._root();
 		var aesObj = this.options.aes || this.name + '/do&j3m()==3{]ddd';
-		var aesObjDepd;
+		var aesObjDepd = depdCrypto(this.options.aes_key || this.name + '/do&j3m()==3{]ddd');
 
-		if (typeof aesObj == 'string') {
-			aesObjDepd = depdCrypto(aesObj);
-			aesObj = crypto(aesObj);
-		}
+		if (typeof aesObj == 'string') aesObj = crypto(aesObj);
 
 		// root+file的时候，必定有"/" 字符
 		if (file.indexOf('/') != -1) {
