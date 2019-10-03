@@ -1,5 +1,4 @@
 var Promise = require('bluebird');
-var fs = Promise.promisifyAll(require('fs'));
 var mkdirp = Promise.promisify(require('mkdirp'));
 var debug = require('debug')('ccr');
 var timekey = require('time-key');
@@ -21,7 +20,7 @@ function Cacher(name, options) {
 	this.options = options || {};
 
 	this._index = 0;
-	this._dir = null;
+	this._dirPromise = null;
 	this.timekey = timekey(this.options.timeformat || 'YYYY/MMDD');
 	this.root = this.options.root || exports.root;
 }
@@ -93,46 +92,40 @@ Cacher.prototype = {
 		var self = this;
 		var daypath = this.timekey.key();
 
-		if (self._dir) {
-			return self._dir.then(function(oldInfo) {
-				if (oldInfo && oldInfo.daypath == daypath) return oldInfo.static;
+		return (self._dirPromise || Promise.resolve())
+			.then(function(info) {
+				debug('from cache info: %o', info);
 
-				debug('new path, name:%s oldInfo:%o new daypath:%s', self.name, oldInfo, daypath);
-				return self._setSelfDir(daypath);
+				if (info && info.daypath == daypath) return info.static;
+			})
+			.then(function(staticPath) {
+				if (staticPath) return staticPath;
+
+				// 创建新的目录
+				var promise = self._newPath(daypath);
+				self._dirPromise = promise.then(function(newpath) {
+					return {
+						daypath: daypath,
+						static: newpath
+					};
+				});
+
+				return promise;
 			});
-		} else {
-			return self._setSelfDir(daypath);
-		}
 	},
-	_setSelfDir: function(daypath) {
-		var promise = this._newPath(daypath);
-		this._dir = promise.then(function(newpath) {
-			return {
-				daypath: daypath,
-				static: newpath
-			};
-		});
 
-		return promise;
-	},
 	_newPath: function(daypath) {
-		var self = this;
 		var random = '' + (Math.random() * 1000 | 0);
 		// 补齐一下位数，目录创建出来整齐一些
 		random = '0000'.substr(random.length) + random;
-
 		var subpath = process.pid + '_' + random;
+		debug('new subpath: %s', subpath);
+
 		var newpath = this._root() + daypath + '/' + subpath;
 
-		return fs.statAsync(newpath)
+		return mkdirp(newpath)
 			.then(function() {
-				return self._newPath(daypath);
-			},
-			function() {
-				return mkdirp(newpath)
-					.then(function() {
-						return newpath;
-					});
+				return newpath;
 			});
 	},
 

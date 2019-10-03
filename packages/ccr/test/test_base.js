@@ -46,8 +46,16 @@ describe('#base', () => {
 	it('#depd crypto', () => {
 		var cache = ccr('depd_crypto');
 
-		return cache.file()
-			.then(() => {
+		return Promise.all([
+			cache.file(),
+			cache.file(),
+			cache.file().then(file => {
+				return cache.file().then(file2 => [file, file2])
+			}),
+		])
+			.then((files) => {
+				console.log('cache check files: %o', files);
+
 				// var sid = cache.downloadkey(file, 'userid');
 				var sid = '7CsaxozvZnlMt2tUzY51JjaJxQl7pnlb7TJVszg8rTKnOTpMZ8VEyxWmzmZgdnsy';
 				var sidfile = cache.downloadkey(sid, 'userid');
