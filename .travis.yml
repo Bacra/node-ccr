@@ -13,5 +13,5 @@ script:
   - npm run test-ci
 
 after_script:
-  - npm install coveralls@2
+  - npm install coveralls@2 -g
   - for file in ./packages/*/coverage/lcov.info; do cat $file | coveralls; done
