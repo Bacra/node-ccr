@@ -7,7 +7,7 @@
     "ls": "lerna ls",
     "pub": "lerna publish",
     "test": "lerna run test",
-    "test-travis": "lerna run test-travis",
+    "test-ci": "lerna run test-ci",
     "test-cov": "lerna run test-cov"
   },
   "devDependencies": {
