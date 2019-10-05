@@ -9,7 +9,7 @@ node_js:
 
 script:
   - npm run lint
-  - npm run bootstrap
+  - npm run bootstrap --no-ci
   - npm run test-ci
 
 after_script:
