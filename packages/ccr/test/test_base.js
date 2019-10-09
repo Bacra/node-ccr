@@ -19,15 +19,9 @@ describe('#base', () => {
 	});
 
 	it('#downloadkey', () => {
-		var sidObj = aesid({
+		var sidObj = aesid('aes key 123', {
 			userid: true,
-			business: {
-				test: {
-					1: 'aes key 123'
-				}
-			}
-		})
-		.business('test');
+		});
 
 		var cache = ccr('test_cache', {
 			aes: sidObj
