@@ -1,6 +1,6 @@
 {
   "name": "ccr",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "File Cache Mgr.",
   "main": "ccr.js",
   "scripts": {
@@ -26,10 +26,10 @@
   },
   "homepage": "https://github.com/Bacra/node-ccr",
   "dependencies": {
-    "bluebird": "^3.7.0",
-    "ccr-file": "^1.1.2",
-    "ccr-aes-path": "^1.0.0",
     "aesid": "^3.3.1",
+    "bluebird": "^3.7.0",
+    "ccr-aes-path": "^1.1.0",
+    "ccr-file": "^1.2.0",
     "debug": "^4.1.1"
   },
   "devDependencies": {
