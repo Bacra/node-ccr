@@ -3,26 +3,26 @@ var mkdirp = Promise.promisify(require('mkdirp'));
 var debug = require('debug')('ccr-file');
 var timekey = require('time-key');
 
-exports = module.exports = Cacher;
+exports = module.exports = CacheFile;
 exports.root = '/tmp/node-ccr';
 
 
 // Main
-function Cacher(name, options) {
-	if (!(this instanceof Cacher)) {
-		return new Cacher(name, options);
+function CacheFile(name, options) {
+	if (!(this instanceof CacheFile)) {
+		return new CacheFile(name, options);
 	}
 
-	this.name = name;
-	this.options = options || {};
+	if (!options) options = {};
 
+	this.name = name;
 	this._index = 0;
 	this._dirPromise = null;
-	this.timekey = timekey(this.options.timeformat || 'YYYY/MMDD');
-	this._parentPath = this.options.root || exports.root;
+	this.timekey = timekey(options.timeformat || 'YYYY/MMDD');
+	this._parentPath = options.root || exports.root;
 }
 
-Cacher.prototype = {
+CacheFile.prototype = {
 	file: function(userid) {
 		var index = ++this._index;
 		// linux math files is 32000
