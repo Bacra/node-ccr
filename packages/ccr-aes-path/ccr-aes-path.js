@@ -11,7 +11,7 @@ module.exports = function(cache, aes, aesidOptions) {
 	var aesObjDepd = depdCrypto(aesidOptions.aes_key || cache.name + '/do&j3m()==3{]ddd');
 	var aesObj = aes;
 
-	if (typeof aesObj == 'string') aesObj = aesid(aesObj, aesidOptions);
+	if (!aesid.is(aesObj)) aesObj = aesid(aesObj, aesidOptions);
 
 	return function(file, userid) {
 		if (!file) return;

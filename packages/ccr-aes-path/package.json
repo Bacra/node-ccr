@@ -26,7 +26,7 @@
   },
   "homepage": "https://github.com/Bacra/node-ccr",
   "dependencies": {
-    "aesid": "^3.1.0",
+    "aesid": "^3.2.0",
     "base64url": "^3.0.1",
     "debug": "^4.1.1"
   },
