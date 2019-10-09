@@ -1,11 +1,11 @@
 {
-  "name": "ccr",
+  "name": "ccr-file",
   "version": "1.1.2",
   "description": "File Cache Mgr.",
   "main": "ccr.js",
   "scripts": {
     "lint": "eslint .",
-    "test": "cross-env DEBUG=ccr* mocha test/test_*.js",
+    "test": "cross-env DEBUG=ccr-file* mocha test/test_*.js",
     "test-cov": "istanbul cover _mocha -- test/test_* --reporter dot",
     "test-ci": "istanbul cover _mocha --report lcovonly -- test/test_* --reporter dot"
   },
