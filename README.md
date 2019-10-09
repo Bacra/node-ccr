@@ -7,7 +7,7 @@
 |---------------|---------------------------|
 | ccr           | [![NPM Version](https://img.shields.io/npm/v/ccr.svg)](https://www.npmjs.org/package/ccr)  |
 | ccr-file      | [![NPM Version](https://img.shields.io/npm/v/ccr-file.svg)](https://www.npmjs.org/package/ccr-file)  |
-| ccr-ase-file  | [![NPM Version](https://img.shields.io/npm/v/ccr-ase-file.svg)](https://www.npmjs.org/package/ccr-ase-file)  |
+| ccr-aes-path  | [![NPM Version](https://img.shields.io/npm/v/ccr-aes-path.svg)](https://www.npmjs.org/package/ccr-aes-path)  |
 
 [travis-image]: https://img.shields.io/travis/Bacra/node-ccr/master.svg?label=linux
 [travis-url]: https://travis-ci.org/Bacra/node-ccr
