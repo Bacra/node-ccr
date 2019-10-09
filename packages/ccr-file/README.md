@@ -21,7 +21,7 @@ var cache = require('ccr-file')('test_cache', { root: __dirname });
 cache.file('userid').then(function(file) {
     // mkdirp paths auto
     console.log(file);
-    // print /tmp/node-ccr/test_cache/2018/0523/15929_0148/1
+    // print /tmp/node-ccr/test_cache/2018/0523/15929_0148/userid_1
 });
 ```
 
