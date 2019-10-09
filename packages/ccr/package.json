@@ -1,11 +1,11 @@
 {
-  "name": "ccr-aes-path",
+  "name": "ccr",
   "version": "1.0.0",
   "description": "File Cache Mgr.",
-  "main": "ccr-aes-path.js",
+  "main": "ccr.js",
   "scripts": {
     "lint": "eslint .",
-    "test": "cross-env DEBUG=ccr-aes-path* mocha test/test_*.js",
+    "test": "cross-env DEBUG=ccr* mocha test/test_*.js",
     "test-cov": "istanbul cover _mocha -- test/test_* --reporter dot",
     "test-ci": "istanbul cover _mocha --report lcovonly -- test/test_* --reporter dot"
   },
@@ -26,12 +26,13 @@
   },
   "homepage": "https://github.com/Bacra/node-ccr",
   "dependencies": {
+    "bluebird": "^3.7.0",
+    "ccr-file": "^1.1.2",
+    "ccr-aes-path": "^1.0.0",
     "aesid": "^3.3.1",
-    "base64url": "^3.0.1",
     "debug": "^4.1.1"
   },
   "devDependencies": {
-    "ccr-file": "^1.1.2",
     "cross-env": "^2.0.0",
     "expect.js": "^0.3.1",
     "istanbul": "^0.4.5",
