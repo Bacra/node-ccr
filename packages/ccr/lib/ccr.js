@@ -22,14 +22,14 @@ function Cacher(name, options) {
 	this._index = 0;
 	this._dirPromise = null;
 	this.timekey = timekey(this.options.timeformat || 'YYYY/MMDD');
-	this.root = this.options.root || exports.root;
+	this._parentPath = this.options.root || exports.root;
 }
 
 Cacher.prototype = {
 	downloadkey: function(file, userid) {
 		if (!file) return;
 
-		var dir = this._root();
+		var dir = this.root();
 		var aesObj = this.options.aes || this.name + '/do&j3m()==3{]ddd';
 		var aesObjDepd = depdCrypto(this.options.aes_key || this.name + '/do&j3m()==3{]ddd');
 
@@ -118,7 +118,7 @@ Cacher.prototype = {
 		var subpath = process.pid + '_' + random;
 		debug('new subpath: %s', subpath);
 
-		var newpath = this._root() + daypath + '/' + subpath;
+		var newpath = this.root() + daypath + '/' + subpath;
 
 		return mkdirp(newpath)
 			.then(function() {
@@ -126,7 +126,7 @@ Cacher.prototype = {
 			});
 	},
 
-	_root: function() {
-		return this.root + '/' + this.name + '/';
+	root: function() {
+		return this._parentPath + '/' + this.name + '/';
 	},
 };
