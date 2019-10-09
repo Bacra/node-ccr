@@ -1,18 +1,18 @@
-var debug = require('debug')('ccr:depd_crypto');
+var debug = require('debug')('ccr-aes-path:depd_crypto');
 var crypto = require('crypto');
 
 module.exports = function(globalAseKey) {
 	return {
-		encrypt: function(data, userid) {
-			data += ',' + Date.now();
+		// encrypt: function(data, userid) {
+		// 	data += ',' + Date.now();
 
-			var aseKey = userid ? globalAseKey + ',' + userid : globalAseKey;
-			var cipher = crypto.createCipher('aes-256-cbc', aseKey);
-			var sid = cipher.update(data, 'utf8', 'base64');
-			sid += cipher.final('base64');
+		// 	var aseKey = userid ? globalAseKey + ',' + userid : globalAseKey;
+		// 	var cipher = crypto.createCipher('aes-256-cbc', aseKey);
+		// 	var sid = cipher.update(data, 'utf8', 'base64');
+		// 	sid += cipher.final('base64');
 
-			return sid;
-		},
+		// 	return sid;
+		// },
 		decrypt: function(sid, userid) {
 			var aseKey = userid ? globalAseKey + ',' + userid : globalAseKey;
 

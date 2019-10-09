@@ -2,9 +2,6 @@ var Promise = require('bluebird');
 var mkdirp = Promise.promisify(require('mkdirp'));
 var debug = require('debug')('ccr');
 var timekey = require('time-key');
-var base64url = require('base64url');
-var depdCrypto = require('./depd_crypto');
-var crypto = require('./crypto');
 
 exports = module.exports = Cacher;
 exports.root = '/tmp/node-ccr';
@@ -26,48 +23,6 @@ function Cacher(name, options) {
 }
 
 Cacher.prototype = {
-	downloadkey: function(file, userid) {
-		if (!file) return;
-
-		var dir = this.root();
-		var aesObj = this.options.aes || this.name + '/do&j3m()==3{]ddd';
-		var aesObjDepd = depdCrypto(this.options.aes_key || this.name + '/do&j3m()==3{]ddd');
-
-		if (typeof aesObj == 'string') aesObj = crypto(aesObj);
-
-		// root+file的时候，必定有"/" 字符
-		if (file.indexOf('/') != -1) {
-			if (file.substr(0, dir.length) == dir) {
-				var data = file.substr(dir.length);
-				var sid = aesObj.encrypt(data, userid);
-				// var sid = (aesObjDepd || aesObj).encrypt(data, userid);
-
-				return base64url.fromBase64(sid);
-			} else {
-				throw new Error('FILE_NOT_IN_ROOT_PATH');
-			}
-		} else {
-			var sid = base64url.toBase64(file);
-			var sidfile;
-
-			try {
-				sidfile = aesObj.decrypt(sid, userid);
-			} catch (err) {
-				if (!aesObjDepd) throw err;
-
-				debug('use depd aes, err: %o', err);
-				try {
-					sidfile = aesObjDepd.decrypt(sid, userid);
-				} catch (err) {
-					// 兼容没有userid
-					sidfile = aesObjDepd.decrypt(sid);
-				}
-			}
-
-			return dir + sidfile;
-		}
-	},
-
 	file: function(userid) {
 		var index = ++this._index;
 		// linux math files is 32000
