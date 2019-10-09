@@ -1,6 +1,6 @@
 var debug = require('debug')('ccr-aes-path:test');
 var expect = require('expect.js');
-var cache = require('ccr')('test', {
+var cache = require('ccr-file')('test', {
 	root: __dirname + '/tmp/',
 });
 

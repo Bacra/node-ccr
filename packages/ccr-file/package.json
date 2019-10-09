@@ -2,7 +2,7 @@
   "name": "ccr-file",
   "version": "1.1.2",
   "description": "File Cache Mgr.",
-  "main": "ccr.js",
+  "main": "ccr-file.js",
   "scripts": {
     "lint": "eslint .",
     "test": "cross-env DEBUG=ccr-file* mocha test/test_*.js",

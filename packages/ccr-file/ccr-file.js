@@ -1,6 +1,6 @@
 var Promise = require('bluebird');
 var mkdirp = Promise.promisify(require('mkdirp'));
-var debug = require('debug')('ccr');
+var debug = require('debug')('ccr-file');
 var timekey = require('time-key');
 
 exports = module.exports = Cacher;

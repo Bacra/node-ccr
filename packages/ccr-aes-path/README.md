@@ -14,7 +14,7 @@ npm install ccr-aes-path --save
 ## Usage
 
 ```javascript
-var cache = require('ccr')('test_cache');
+var cache = require('ccr-file')('test_cache');
 // aes: aes key or aesid obj
 var aeskey = require('ccr-ase-path')(cache, aes, aesidOptions);
 
