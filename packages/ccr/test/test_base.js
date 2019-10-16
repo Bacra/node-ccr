@@ -1,12 +1,12 @@
-var Promise = require('bluebird');
-var fs = Promise.promisifyAll(require('fs'));
-var debug = require('debug')('ccr:test');
-var expect = require('expect.js');
+const Promise = require('bluebird');
+const fs = Promise.promisifyAll(require('fs'));
+const debug = require('debug')('ccr:test');
+const expect = require('expect.js');
 
 describe('#base', () => {
 
 	it('#base', () => {
-		var cache = require('../')('test', {
+		const cache = require('../')('test', {
 			root: __dirname + '/tmp/',
 			aes: 'ase key 1234'
 		});

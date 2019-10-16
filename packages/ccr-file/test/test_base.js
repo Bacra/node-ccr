@@ -1,6 +1,6 @@
-var expect = require('expect.js');
-var ccr = require('../');
-var path = require('path');
+const expect = require('expect.js');
+const ccr = require('../');
+const path = require('path');
 
 ccr.root = __dirname + '/tmp';
 ccr.maxfile = 20;
@@ -51,8 +51,8 @@ describe('#base', () => {
 
 		return cache.file()
 			.then(file1 => {
-				var arr = [];
-				for(var i = ccr.maxfile; i--;) {
+				const arr = [];
+				for(let i = ccr.maxfile; i--;) {
 					arr.push(cache.file());
 				}
 

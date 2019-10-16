@@ -1,8 +1,8 @@
-var Promise = require('bluebird');
-var fs = Promise.promisifyAll(require('fs'));
-var mkdirp = Promise.promisify(require('mkdirp'));
-var debug = require('debug')('ccr-file');
-var timekey = require('time-key');
+const Promise = require('bluebird');
+const fs = Promise.promisifyAll(require('fs'));
+const mkdirp = Promise.promisify(require('mkdirp'));
+const debug = require('debug')('ccr-file');
+const timekey = require('time-key');
 
 exports = module.exports = CacheFile;
 exports.root = '/tmp/node-ccr';
@@ -28,7 +28,7 @@ function CacheFile(name, options) {
 
 CacheFile.prototype = {
 	file: function(userid) {
-		var index = this._index++;
+		let index = this._index++;
 
 		if (index > exports.maxfile) {
 			// 强制更新目录
@@ -36,7 +36,7 @@ CacheFile.prototype = {
 			this._index = index = 0;
 		}
 
-		var filename = index;
+		let filename = index;
 		if (userid) filename = userid + '_' + filename;
 
 		return this.path()
@@ -46,8 +46,8 @@ CacheFile.prototype = {
 	},
 
 	path: function() {
-		var self = this;
-		var daypath = this.timekey.key();
+		const self = this;
+		const daypath = this.timekey.key();
 
 		return (self._dirPromise || Promise.resolve())
 			.then(function(info) {
@@ -59,7 +59,7 @@ CacheFile.prototype = {
 				if (staticPath) return staticPath;
 
 				// 创建新的目录
-				var promise = self._newPath(daypath);
+				const promise = self._newPath(daypath);
 				self._dirPromise = promise.then(function(newpath) {
 					return {
 						daypath: daypath,
@@ -72,12 +72,12 @@ CacheFile.prototype = {
 	},
 
 	_newPath: function(daypath) {
-		var self = this;
+		const self = this;
 		// 补齐一下位数，目录创建出来整齐一些
-		var subpath = process.pid + '-' + Date.now() + '-' + (Math.random() * 10000000000 | 0);
+		const subpath = process.pid + '-' + Date.now() + '-' + (Math.random() * 10000000000 | 0);
 		debug('new subpath: %s', subpath);
 
-		var newpath = this.root() + daypath + '/' + subpath;
+		const newpath = this.root() + daypath + '/' + subpath;
 
 		return fs.statAsync(newpath)
 			.then(function() {
