@@ -21,7 +21,7 @@ function CCR(name, options) {
 		? options.aes
 		: aesid(options.aes || this.cache.name + '/ddx^d88=++4@rf.co', options);
 
-	this.aeskey = ccrAesPath(this.cache, this.aes);
+	this.aeskey = ccrAesPath(this.cache.root(), this.aes);
 }
 
 CCR.prototype = {
