@@ -6,6 +6,9 @@ var timekey = require('time-key');
 
 exports = module.exports = CacheFile;
 exports.root = '/tmp/node-ccr';
+// 单个目录最多文件数据
+// linux max files is 32000
+exports.maxfile = 20000;
 
 
 // Main
@@ -26,8 +29,9 @@ function CacheFile(name, options) {
 CacheFile.prototype = {
 	file: function(userid) {
 		var index = this._index++;
-		// linux math files is 32000
-		if (index > 20000) {
+
+		if (index > exports.maxfile) {
+			// 强制更新目录
 			this._dirPromise = null;
 			this._index = index = 0;
 		}
