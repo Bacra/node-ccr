@@ -8,7 +8,9 @@ const aesid = require('aesid');
 const ccrFile = require('ccr-file');
 const ccrAesPath = require('ccr-aes-path');
 
-module.exports = CCR;
+exports = module.exports = CCR;
+exports.ccrFile = ccrFile;
+exports.root = '/tmp/node-ccr';
 
 function CCR(name, options) {
 	if (!(this instanceof CCR)) {
@@ -16,7 +18,11 @@ function CCR(name, options) {
 	}
 	if (!options) options = {};
 
-	this.cache = ccrFile(name, options);
+	const ccrFileOptions = Object.assign({
+		root: exports.root
+	}, options);
+
+	this.cache = ccrFile(name, ccrFileOptions);
 	this.aes = aesid.is(options.aes)
 		? options.aes
 		: aesid(options.aes || this.cache.name + '/ddx^d88=++4@rf.co', options);
