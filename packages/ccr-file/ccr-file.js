@@ -1,4 +1,5 @@
 var Promise = require('bluebird');
+var fs = Promise.promisifyAll(require('fs'));
 var mkdirp = Promise.promisify(require('mkdirp'));
 var debug = require('debug')('ccr-file');
 var timekey = require('time-key');
@@ -24,7 +25,7 @@ function CacheFile(name, options) {
 
 CacheFile.prototype = {
 	file: function(userid) {
-		var index = ++this._index;
+		var index = this._index++;
 		// linux math files is 32000
 		if (index > 20000) {
 			this._dirPromise = null;
@@ -67,17 +68,26 @@ CacheFile.prototype = {
 	},
 
 	_newPath: function(daypath) {
-		var random = '' + (Math.random() * 1000 | 0);
+		var self = this;
 		// 补齐一下位数，目录创建出来整齐一些
-		random = '0000'.substr(random.length) + random;
-		var subpath = process.pid + '_' + random;
+		var subpath = process.pid + '-' + Date.now() + '-' + (Math.random() * 10000000000 | 0);
 		debug('new subpath: %s', subpath);
 
 		var newpath = this.root() + daypath + '/' + subpath;
 
-		return mkdirp(newpath)
+		return fs.statAsync(newpath)
 			.then(function() {
-				return newpath;
+				return self._newPath(daypath);
+			}, function(err) {
+				if (err && err.code == 'ENOENT') {
+					return mkdirp(newpath)
+						.then(function() {
+							return newpath;
+						});
+				} else {
+					debug('stats err: %o', err);
+					throw err;
+				}
 			});
 	},
 
