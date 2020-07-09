@@ -1,6 +1,6 @@
 {
   "name": "ccr-aes-path",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "File Cache Mgr.",
   "main": "ccr-aes-path.js",
   "scripts": {
